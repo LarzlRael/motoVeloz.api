@@ -4,12 +4,14 @@ import {
   createStore,
   updateStore,
   deleteStore,
+  getOneStoreById,
 } from '../controllers/store.controller.js'
 
 const router = Router()
 
 /* GetRoutes */
 router.get('/', getStores)
+router.get('/:id', getOneStoreById)
 
 /* Post routes */
 router.post('/', createStore)

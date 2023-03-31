@@ -2,27 +2,27 @@ import { Schema, model } from 'mongoose'
 
 const StoreSchema = Schema(
   {
-    shopName: {
+    storeName: {
       type: String,
       required: true,
     },
-    shopPublicImageId: {
+    storePublicImageId: {
       type: String,
-      required: true,
+      default: null,
     },
     imageUrl: {
       type: String,
       required: true,
     },
-    shopDescription: {
+    storeDescription: {
       type: String,
       required: true,
     },
-    shopAddress: {
+    storeAddress: {
       type: String,
       required: true,
     },
-    shopPhone: {
+    storePhone: {
       type: String,
       required: true,
     },

@@ -6,7 +6,7 @@ dotenv.config()
 import multer, { diskStorage } from 'multer'
 import { v4 as uuidv4 } from 'uuid'
 import path, { dirname } from 'path'
-
+import cors from 'cors'
 import { fileURLToPath } from 'url'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
@@ -25,7 +25,7 @@ dbConnection()
 const port = process.env.PORT || 4000
 app.use(morgan('dev'))
 app.use(express.json())
-
+app.use(cors())
 app.use(express.urlencoded({ extended: false }))
 const storage = diskStorage({
   destination: path.join(__dirname, 'public/img/uploads'),

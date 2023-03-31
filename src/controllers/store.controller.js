@@ -8,25 +8,34 @@ export async function getStores(req, res, next) {
     next(error)
   }
 }
+export async function getOneStoreById(req, res, next) {
+  const { id } = req.params
+  try {
+    const store = await Store.findById(id)
+    res.json(store)
+  } catch (error) {
+    next(error)
+  }
+}
 
 export async function createStore(req, res, next) {
   const {
-    shopName,
-    shopPublicImageId,
+    storeName,
+    storePublicImageId,
     imageUrl,
-    shopDescription,
-    shopAddress,
-    shopPhone,
+    storeDescription,
+    storeAddress,
+    storePhone,
     storeUrl,
   } = req.body
   try {
     const createdStore = await Store.create({
-      shopName,
-      shopPublicImageId,
+      storeName,
+      storePublicImageId,
       imageUrl,
-      shopDescription,
-      shopAddress,
-      shopPhone,
+      storeDescription,
+      storeAddress,
+      storePhone,
       storeUrl,
     })
     await createdStore.save()
