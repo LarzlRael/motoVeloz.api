@@ -6,6 +6,10 @@ const StoreSchema = Schema(
       type: String,
       required: true,
     },
+    storeUrl: {
+      type: String,
+      required: true,
+    },
     storePublicImageId: {
       type: String,
       default: null,
@@ -20,15 +24,15 @@ const StoreSchema = Schema(
     },
     storeAddress: {
       type: String,
-      required: true,
+      /* required: true, */
     },
     storePhone: {
       type: String,
-      required: true,
+      /* required: true, */
     },
-    storeUrl: {
-      type: String,
-      required: true,
+    storeVisiblity: {
+      type: Boolean,
+      default: true,
     },
   },
   {

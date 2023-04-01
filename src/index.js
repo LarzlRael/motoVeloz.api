@@ -12,6 +12,9 @@ import { fileURLToPath } from 'url'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 // Import routes
 import storeRoutes from './routes/store.routes.js'
+import authRoutes from './routes/auth.routes.js'
+
+
 import dbConnection from './database/databaseConfig.js'
 /* import { checkFileType } from './utils/utilsFiles.js' */
 
@@ -60,6 +63,7 @@ function checkFileType(file, cb) {
 
 // Routes
 app.use('/api/stores', storeRoutes)
+app.use('/api/auth', authRoutes)
 
 app.listen(port, (err) => {
   if (err) throw new Error(err)
