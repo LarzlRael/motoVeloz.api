@@ -23,7 +23,7 @@ export const login = async (req, res) => {
     })
   }
 
-  const token = jwt.sign({ usuario: getUser.userName }, process.env.JWTSEED, {
+  const token = jwt.sign({ uid: getUser.id }, process.env.JWTSEED, {
     expiresIn: 14400,
   })
   return res.status(200).json({
@@ -53,5 +53,23 @@ export const register = async (req, res) => {
   await newUser.save()
   return res.status(200).json({
     ok: true,
+  })
+}
+export const verifyToken = (req, res, next) => {
+  const token = req.headers['authorization'].split(' ')[1]
+
+  if (!token) {
+    return res.status(403).json({
+      auth: false,
+      message: 'No token provided',
+    })
+  }
+  const decoded = jwt.verify(token, process.env.JWTSEED)
+  req.userId = decoded.id
+  const newToken = jwt.sign({ uid: decoded.id }, process.env.JWTSEED, {
+    expiresIn: 14400,
+  })
+  return res.status(200).json({
+    token: newToken,
   })
 }

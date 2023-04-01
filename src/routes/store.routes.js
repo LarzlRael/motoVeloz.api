@@ -6,6 +6,7 @@ import {
   deleteStore,
   getOneStoreById,
 } from '../controllers/store.controller.js'
+import { verificateToken } from '../middlewares/jwtVerification.js'
 
 const router = Router()
 
@@ -14,12 +15,12 @@ router.get('/', getStores)
 router.get('/:id', getOneStoreById)
 
 /* Post routes */
-router.post('/', createStore)
+router.post('/', verificateToken, createStore)
 
 /* Put routes */
-router.put('/:id', updateStore)
+router.put('/:id', verificateToken, updateStore)
 
 /* Delete routes */
-router.delete('/:id', deleteStore)
+router.delete('/:id', verificateToken, deleteStore)
 
 export default router
