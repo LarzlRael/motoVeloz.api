@@ -6,7 +6,7 @@ export const verificateToken = (req, res, next) => {
   //? 1- token
   //? 2- seed
   //? 3- callback
-  console.log(token)
+
   jwt.verify(token, process.env.JWTSEED, (err, decoded) => {
     if (err) {
       return res.status(400).json({
