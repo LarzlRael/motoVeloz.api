@@ -10,9 +10,11 @@ import cors from 'cors'
 import { fileURLToPath } from 'url'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
-// Import routes
+
+// importing routes
 import storeRoutes from './routes/store.routes.js'
 import authRoutes from './routes/auth.routes.js'
+import notificationRoutes from './routes/notification.routes'
 
 
 import dbConnection from './database/databaseConfig.js'
@@ -64,6 +66,7 @@ function checkFileType(file, cb) {
 // Routes
 app.use('/api/stores', storeRoutes)
 app.use('/api/auth', authRoutes)
+app.use('/api/notifications', notificationRoutes)
 
 app.listen(port, (err) => {
   if (err) throw new Error(err)
