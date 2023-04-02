@@ -14,7 +14,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 // importing routes
 import storeRoutes from './routes/store.routes.js'
 import authRoutes from './routes/auth.routes.js'
-import notificationRoutes from './routes/notification.routes'
+import notificationRoutes from './routes/notification.routes.js'
 
 
 import dbConnection from './database/databaseConfig.js'

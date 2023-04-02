@@ -1,4 +1,5 @@
-/* 
+import DeviceToken from '../models/DeviceToken.js'
+/*
 export interface IpushNotification {
   to?: string;
   registration_ids?: string[];
@@ -37,7 +38,6 @@ export async function sendPushNotification(req, res) {
       title,
       body,
     },
-    
   }
   try {
     const response = await fetch('https://fcm.googleapis.com/fcm/send', {
@@ -55,6 +55,24 @@ export async function sendPushNotification(req, res) {
 
     const data = await response.json()
     res.status(200).json(data)
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+}
+
+export async function saveDeviceId(req, res) {
+  const { token } = req.params
+  const isTokenExists = DeviceToken.findOne({ token })
+
+  try {
+    if (isTokenExists) {
+      return res.status(200).json({ message: 'Token already exists' })
+    }
+    const deviceToken = DeviceToken({
+      token,
+    })
+    await deviceToken.save()
+    res.status(200).json({ message: 'Token saved' })
   } catch (error) {
     res.status(500).json({ error: error.message })
   }
