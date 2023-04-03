@@ -1,4 +1,6 @@
+import { validationResult } from 'express-validator'
 import Store from '../models/Store.js'
+import { verifyErrors } from '../utils/validation.js'
 
 export async function getStores(req, res, next) {
   try {
@@ -19,6 +21,7 @@ export async function getOneStoreById(req, res, next) {
 }
 
 export async function createStore(req, res, next) {
+  verifyErrors(req)
   const {
     storeName,
     storePublicImageId,

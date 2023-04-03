@@ -7,6 +7,7 @@ import {
   getOneStoreById,
 } from '../controllers/store.controller.js'
 import { verificateToken } from '../middlewares/jwtVerification.js'
+import { body } from 'express-validator'
 
 const router = Router()
 
@@ -15,7 +16,15 @@ router.get('/', getStores)
 router.get('/:id', getOneStoreById)
 
 /* Post routes */
-router.post('/', verificateToken, createStore)
+router.post(
+  '/',
+  [
+    body('storeName', 'Name is required').notEmpty(),
+    body('storeUrl', 'Address is required').notEmpty().isURL(),
+    verificateToken,
+  ],
+  createStore,
+)
 
 /* Put routes */
 router.put('/:id', verificateToken, updateStore)
