@@ -6,9 +6,8 @@ npm run build
 
 #!
 
-rm -rf './dist'
+
 cp -r './dist' '../motoVeloz.api/public/'
-rm -rf '../motoVeloz.api/public/dist'
 
 
 cd './../motoVeloz.api'
