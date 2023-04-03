@@ -1,4 +1,5 @@
 import DeviceToken from '../models/DeviceToken.js'
+import Notification from '../models/Notification.js'
 /*
 export interface IpushNotification {
   to?: string;
@@ -73,6 +74,59 @@ export async function saveDeviceId(req, res) {
     })
     await deviceToken.save()
     res.status(200).json({ message: 'Token saved' })
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+}
+
+export async function createNotification(req, res) {
+  const { title, body, imageUrl } = req.body
+  console.log(title,body,imageUrl);
+  const notification = Notification({
+    title,
+    body,
+    imageUrl,
+  })
+  try {
+    await notification.save()
+    res.status(200).json({ message: 'Notification created' })
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+}
+export async function getNotifications(req, res) {
+  try {
+    const notifications = await Notification.find()
+    res.status(200).json(notifications)
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+}
+export async function editNotification(req, res) {
+  try {
+    const notification = await Notification.findById(req.params.id)
+    if (notification) {
+      notification.title = req.body.title
+      notification.body = req.body.body
+      notification.urlImage = req.body.urlImage
+      const notificationSaved = await notification.save()
+      res.status(200).json(notificationSaved)
+    } else {
+      res.status(404).json({ message: 'Notification not found' })
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+}
+export async function deleteNotification(req, res) {
+  try {
+    const notification = await Notification.findById(req.params.id)
+    if (notification) {
+      await Notification.deleteOne({ _id: req.params.id })
+      res.status(200).json({ message: 'Notification deleted' })
+    } else {
+      res.status(404).json({ message: 'Notification not found' })
+    }
   } catch (error) {
     res.status(500).json({ error: error.message })
   }
