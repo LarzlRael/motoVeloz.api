@@ -9,6 +9,8 @@ npm run build
 cp -r './dist' '../motoVeloz.api/public/'
 
 
-git a
+cd './../motoVeloz.api'
 
+git checkout -b deploy
+git a
 git commit -m "Deploy"
