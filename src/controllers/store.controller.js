@@ -89,3 +89,20 @@ export async function deleteStore(req, res, next) {
     res.status(500).json({ message: 'Error al eliminar la tienda la tienda' })
   }
 }
+
+export async function findStoreByName(req, res, next) {
+  const { query } = req.params
+  try {
+    const getStores = await Store.find({
+      storeName: query,
+    })
+    if (getStores || getStores.length === 0) {
+      return await getStores(req, res, next)
+    }
+
+    return res.status(200).json(getStores)
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({ message: 'Error al eliminar la tienda la tienda' })
+  }
+}
