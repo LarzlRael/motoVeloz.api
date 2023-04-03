@@ -108,12 +108,14 @@ export async function getNotifications(req, res) {
 }
 
 export async function editNotification(req, res) {
+  const { title, body, imageUrl } = req.body
+  console.log(title, body, imageUrl)
   try {
     const notification = await Notification.findById(req.params.id)
     if (notification) {
-      notification.title = req.body.title
-      notification.body = req.body.body
-      notification.urlImage = req.body.urlImage
+      notification.title = title
+      notification.body = body
+      notification.imageUrl = imageUrl
       const notificationSaved = await notification.save()
       res.status(200).json(notificationSaved)
     } else {

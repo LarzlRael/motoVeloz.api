@@ -16,19 +16,15 @@ const StoreSchema = Schema(
     },
     imageUrl: {
       type: String,
-      required: true,
     },
     storeDescription: {
       type: String,
-      required: true,
     },
     storeAddress: {
       type: String,
-      /* required: true, */
     },
     storePhone: {
       type: String,
-      /* required: true, */
     },
     storeVisiblity: {
       type: Boolean,
