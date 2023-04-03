@@ -11,6 +11,7 @@ cp -r './dist' '../motoVeloz.api/public/'
 
 cd './../motoVeloz.api'
 
-git checkout -b deploy
+git checkout deploy
 git a
 git commit -m "Deploy"
+git push
