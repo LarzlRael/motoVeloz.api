@@ -1,7 +1,7 @@
 import axios from 'axios'
 import DeviceToken from '../models/DeviceToken.js'
 import Notification from '../models/Notification.js'
-import { verifyErrors } from '../utils/validation.js'
+import { capitalizeFirstLetter, verifyErrors } from '../utils/validation.js'
 /*
 export interface IpushNotification {
   to?: string;
@@ -87,8 +87,8 @@ export async function createNotification(req, res) {
   const { title, body, imageUrl } = req.body
   console.log(title, body, imageUrl)
   const notification = Notification({
-    title,
-    body,
+    title: capitalizeFirstLetter(title),
+    body: capitalizeFirstLetter(body),
     imageUrl,
   })
   try {
