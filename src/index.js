@@ -16,7 +16,6 @@ import storeRoutes from './routes/store.routes.js'
 import authRoutes from './routes/auth.routes.js'
 import notificationRoutes from './routes/notification.routes.js'
 
-
 import dbConnection from './database/databaseConfig.js'
 /* import { checkFileType } from './utils/utilsFiles.js' */
 
@@ -62,11 +61,18 @@ function checkFileType(file, cb) {
     cb('Error: Images Only!')
   }
 }
+//public route
+app.use(express.static(__dirname + '/public/dist'))
 
 // Routes
 app.use('/api/stores', storeRoutes)
 app.use('/api/auth', authRoutes)
 app.use('/api/notifications', notificationRoutes)
+
+//
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '/public/dist/', 'index.html'))
+})
 
 app.listen(port, (err) => {
   if (err) throw new Error(err)
