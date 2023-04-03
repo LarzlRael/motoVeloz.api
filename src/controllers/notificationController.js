@@ -1,3 +1,5 @@
+
+import axios from 'axios'
 import DeviceToken from '../models/DeviceToken.js'
 import Notification from '../models/Notification.js'
 /*
@@ -32,39 +34,40 @@ interface INotification {
  */
 
 export async function sendPushNotification(req, res) {
-  const { title, body, token } = req.body
+  const getDevicesIds = await DeviceToken.find()
+  const devicesIds = getDevicesIds.map((device) => device.token)
+  console.log(devicesIds)
+  const { title, body, imageUrl } = req.body
   const sendData = {
-    to: token,
+    registration_ids: devicesIds,
     notification: {
       title,
       body,
+      image: imageUrl,
     },
   }
   try {
-    const response = await fetch('https://fcm.googleapis.com/fcm/send', {
+    const notification = await axios({
       method: 'POST',
+      url: 'https://fcm.googleapis.com/fcm/send',
+      data: sendData,
       headers: {
         Authorization: `key=${process.env.FIREBASE_TOKEN}`,
-        'Content-Type': 'application/json',
       },
-      body: JSON.stringify(sendData),
     })
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
-    }
-
-    const data = await response.json()
-    res.status(200).json(data)
+    console.log(notification.data);
+    res.status(200).json({ message: 'Notification sent' })
   } catch (error) {
     res.status(500).json({ error: error.message })
+    console.log(error)
   }
 }
 
 export async function saveDeviceId(req, res) {
   const { token } = req.params
-  const isTokenExists = DeviceToken.findOne({ token })
 
+  const isTokenExists = await DeviceToken.findOne({ token })
+  console.log(isTokenExists)
   try {
     if (isTokenExists) {
       return res.status(200).json({ message: 'Token already exists' })
@@ -81,7 +84,7 @@ export async function saveDeviceId(req, res) {
 
 export async function createNotification(req, res) {
   const { title, body, imageUrl } = req.body
-  console.log(title,body,imageUrl);
+  console.log(title, body, imageUrl)
   const notification = Notification({
     title,
     body,
@@ -102,6 +105,7 @@ export async function getNotifications(req, res) {
     res.status(500).json({ error: error.message })
   }
 }
+
 export async function editNotification(req, res) {
   try {
     const notification = await Notification.findById(req.params.id)
