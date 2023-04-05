@@ -1,6 +1,8 @@
-import { validationResult } from 'express-validator'
+import fs from 'fs'
+
 import Store from '../models/Store.js'
 import { verifyErrors } from '../utils/validation.js'
+import cloudinary from '../utils/cloudinaryConfig.js'
 
 export async function getStores(req, res, next) {
   try {
@@ -22,24 +24,18 @@ export async function getOneStoreById(req, res, next) {
 
 export async function createStore(req, res, next) {
   verifyErrors(req)
-  const {
-    storeName,
-    storePublicImageId,
-    imageUrl,
-    storeDescription,
-    storeAddress,
-    storePhone,
-    storeUrl,
-  } = req.body
+  const file = req.file
+
+  if (file) {
+    const result = await cloudinary.uploader.upload(file.path, {
+      folder: 'motoVeloz',
+    })
+    req.body.imageUrl = result.secure_url
+    req.body.storePublicImageId = result.public_id
+  }
   try {
     const createdStore = await Store.create({
-      storeName,
-      storePublicImageId,
-      imageUrl,
-      storeDescription,
-      storeAddress,
-      storePhone,
-      storeUrl,
+      ...req.body,
     })
     await createdStore.save()
     res.status(201).json(createdStore)
@@ -50,20 +46,25 @@ export async function createStore(req, res, next) {
 }
 
 export async function updateStore(req, res, next) {
-  const {
-    shopName,
-    shopPublicImageId,
-    imageUrl,
-    shopDescription,
-    shopAddress,
-    shopPhone,
-    storeUrl,
-  } = req.body
+  verifyErrors(req)
+  const file = req.file
   const { id } = req.params
   try {
     const getStore = await Store.findById(id)
     if (!getStore) {
       res.status(404).json({ message: 'No existe la tienda' })
+    }
+    if (file) {
+      if (getStore.storePublicImageId) {
+        await cloudinary.uploader.destroy(getStore.storePublicImageId)
+      }
+      const result = await cloudinary.uploader.upload(file.path, {
+        folder: 'motoVeloz',
+      })
+      console.log(result);
+      await fs.promises.unlink(req.file.path)
+      req.body.imageUrl = result.secure_url
+      req.body.storePublicImageId = result.public_id
     }
     const updatedStore = await Store.findByIdAndUpdate(id, {
       ...req.body,
@@ -82,6 +83,9 @@ export async function deleteStore(req, res, next) {
       res.status(404).json({ message: 'No existe la tienda' })
     }
     /* delete store */
+    if (getStore.storePublicImageId) {
+      await cloudinary.uploader.destroy(getStore.storePublicImageId)
+    }
     await Store.findByIdAndDelete(id)
     return res.status(200).json({ message: 'Tienda eliminada' })
   } catch (error) {
@@ -92,17 +96,27 @@ export async function deleteStore(req, res, next) {
 
 export async function findStoreByName(req, res, next) {
   const { query } = req.params
+  console.log(query)
   try {
-    const getStores = await Store.find({
-      storeName: query,
+    const getSearchStores = await Store.find({
+      storeName: { $regex: new RegExp(query.toLowerCase(), 'i') },
     })
-    if (getStores || getStores.length === 0) {
+    console.log(getSearchStores)
+    /* if (getStores || getStores.length === 0) {
       return await getStores(req, res, next)
-    }
+    } */
 
-    return res.status(200).json(getStores)
+    return res.status(200).json(getSearchStores)
   } catch (error) {
     console.log(error)
-    res.status(500).json({ message: 'Error al eliminar la tienda la tienda' })
+    res.status(500).json({ message: 'Error al buscar la tienda' })
+  }
+}
+export async function getOnlyUrlStoresAndName(req, res, next) {
+  try {
+    const stores = await Store.find({}, { storeName: 1, imageUrl: 1 })
+    res.json(stores)
+  } catch (error) {
+    next(error)
   }
 }
