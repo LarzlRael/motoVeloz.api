@@ -3,6 +3,7 @@ import DeviceToken from '../models/DeviceToken.js'
 import Notification from '../models/Notification.js'
 import { capitalizeFirstLetter, verifyErrors } from '../utils/validation.js'
 import cloudinary from '../utils/cloudinaryConfig.js'
+import fs from 'fs'
 /*
 export interface IpushNotification {
   to?: string;
@@ -91,6 +92,7 @@ export async function createNotification(req, res) {
       folder: 'notifications',
     })
     req.body.imageUrl = cloudinaryUpload.secure_url
+    await fs.promises.unlink(req.file.path);
   }
 
   const notification = Notification({

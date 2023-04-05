@@ -1,4 +1,5 @@
-import { validationResult } from 'express-validator'
+import fs from 'fs'
+
 import Store from '../models/Store.js'
 import { verifyErrors } from '../utils/validation.js'
 import cloudinary from '../utils/cloudinaryConfig.js'
@@ -60,6 +61,7 @@ export async function updateStore(req, res, next) {
       const result = await cloudinary.uploader.upload(file.path, {
         folder: 'motoVeloz',
       })
+      await fs.promises.unlink(req.file.path)
       req.body.imageUrl = result.secure_url
       req.body.storePublicImageId = result.public_id
     }
