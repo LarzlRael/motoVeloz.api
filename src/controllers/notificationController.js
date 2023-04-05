@@ -2,6 +2,7 @@ import axios from 'axios'
 import DeviceToken from '../models/DeviceToken.js'
 import Notification from '../models/Notification.js'
 import { capitalizeFirstLetter, verifyErrors } from '../utils/validation.js'
+import cloudinary from '../utils/cloudinaryConfig.js'
 /*
 export interface IpushNotification {
   to?: string;
@@ -33,11 +34,9 @@ interface INotification {
 }
  */
 
-export async function sendPushNotification(req, res) {
+/* export async function sendPushNotification(req, res) {
   verifyErrors(req)
-  const getDevicesIds = await DeviceToken.find()
-  const devicesIds = getDevicesIds.map((device) => device.token)
-  console.log(devicesIds)
+
   const { title, body, imageUrl } = req.body
   const sendData = {
     registration_ids: devicesIds,
@@ -62,13 +61,12 @@ export async function sendPushNotification(req, res) {
     res.status(500).json({ error: error.message })
     console.log(error)
   }
-}
+} */
 
 export async function saveDeviceId(req, res) {
   const { token } = req.params
 
   const isTokenExists = await DeviceToken.findOne({ token })
-  console.log(isTokenExists)
   try {
     if (isTokenExists) {
       return res.status(200).json({ message: 'Token already exists' })
@@ -84,17 +82,33 @@ export async function saveDeviceId(req, res) {
 }
 
 export async function createNotification(req, res) {
-  const { title, body, imageUrl } = req.body
-  console.log(title, body, imageUrl)
+  verifyErrors(req)
+  const { title, body } = req.body
+
+  const file = req.file
+  if (file) {
+    const cloudinaryUpload = await cloudinary.uploader.upload(file.path, {
+      folder: 'notifications',
+    })
+    req.body.imageUrl = cloudinaryUpload.secure_url
+  }
+
   const notification = Notification({
     title: capitalizeFirstLetter(title),
     body: capitalizeFirstLetter(body),
-    imageUrl,
+    imageUrl: req.body.imageUrl,
   })
+  console.log(notification)
   try {
     await notification.save()
+    await sendPushNotification(
+      capitalizeFirstLetter(title),
+      capitalizeFirstLetter(body),
+      req.body.imageUrl,
+    )
     res.status(200).json({ message: 'Notification created' })
   } catch (error) {
+    console.log(error)
     res.status(500).json({ error: error.message })
   }
 }
@@ -108,6 +122,7 @@ export async function getNotifications(req, res) {
 }
 
 export async function editNotification(req, res) {
+  verifyErrors(req)
   const { title, body, imageUrl } = req.body
   console.log(title, body, imageUrl)
   try {
@@ -130,6 +145,9 @@ export async function deleteNotification(req, res) {
     const notification = await Notification.findById(req.params.id)
     if (notification) {
       await Notification.deleteOne({ _id: req.params.id })
+      if (notification.publicImageId) {
+        cloudinary.uploader.destroy(notification.publicImageId)
+      }
       res.status(200).json({ message: 'Notification deleted' })
     } else {
       res.status(404).json({ message: 'Notification not found' })
@@ -137,4 +155,28 @@ export async function deleteNotification(req, res) {
   } catch (error) {
     res.status(500).json({ error: error.message })
   }
+}
+
+async function sendPushNotification(title, body, image) {
+  const getDevicesIds = await DeviceToken.find()
+  const devicesIds = getDevicesIds.map((device) => device.token)
+
+  const sendData = {
+    registration_ids: devicesIds,
+    notification: {
+      title,
+      body,
+      image: image,
+    },
+  }
+
+  const send = await axios({
+    method: 'POST',
+    url: 'https://fcm.googleapis.com/fcm/send',
+    data: sendData,
+    headers: {
+      Authorization: `key=${process.env.FIREBASE_TOKEN}`,
+    },
+  })
+  console.log(send.data)
 }
