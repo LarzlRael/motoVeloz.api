@@ -148,7 +148,7 @@ export async function deleteNotification(req, res) {
     if (notification) {
       await Notification.deleteOne({ _id: req.params.id })
       if (notification.publicImageId) {
-        cloudinary.uploader.destroy(notification.publicImageId)
+        await cloudinary.uploader.destroy(notification.publicImageId)
       }
       res.status(200).json({ message: 'Notification deleted' })
     } else {

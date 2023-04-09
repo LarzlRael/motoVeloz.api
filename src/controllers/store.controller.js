@@ -61,6 +61,7 @@ export async function updateStore(req, res, next) {
       const result = await cloudinary.uploader.upload(file.path, {
         folder: 'motoVeloz',
       })
+      console.log(result);
       await fs.promises.unlink(req.file.path)
       req.body.imageUrl = result.secure_url
       req.body.storePublicImageId = result.public_id
