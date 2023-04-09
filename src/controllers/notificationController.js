@@ -92,7 +92,7 @@ export async function createNotification(req, res) {
       folder: 'notifications',
     })
     req.body.imageUrl = cloudinaryUpload.secure_url
-    await fs.promises.unlink(req.file.path);
+    await fs.promises.unlink(req.file.path)
   }
 
   const notification = Notification({
@@ -100,7 +100,7 @@ export async function createNotification(req, res) {
     body: capitalizeFirstLetter(body),
     imageUrl: req.body.imageUrl,
   })
-  console.log(notification)
+
   try {
     await notification.save()
     await sendPushNotification(
@@ -130,14 +130,14 @@ export async function editNotification(req, res) {
   try {
     const notification = await Notification.findById(req.params.id)
     if (notification) {
-      notification.title = title
-      notification.body = body
-      notification.imageUrl = imageUrl
-      const notificationSaved = await notification.save()
-      res.status(200).json(notificationSaved)
-    } else {
       res.status(404).json({ message: 'Notification not found' })
     }
+
+    notification.title = title
+    notification.body = body
+    notification.imageUrl = imageUrl
+    const notificationSaved = await notification.save()
+    res.status(200).json(notificationSaved)
   } catch (error) {
     res.status(500).json({ error: error.message })
   }
@@ -145,15 +145,14 @@ export async function editNotification(req, res) {
 export async function deleteNotification(req, res) {
   try {
     const notification = await Notification.findById(req.params.id)
-    if (notification) {
-      await Notification.deleteOne({ _id: req.params.id })
-      if (notification.publicImageId) {
-        await cloudinary.uploader.destroy(notification.publicImageId)
-      }
-      res.status(200).json({ message: 'Notification deleted' })
-    } else {
+    if (!notification) {
       res.status(404).json({ message: 'Notification not found' })
     }
+    if (notification.publicImageId) {
+      await cloudinary.uploader.destroy(notification.publicImageId)
+    }
+    await Notification.deleteOne({ _id: req.params.id })
+    res.status(200).json({ message: 'Notification deleted' })
   } catch (error) {
     res.status(500).json({ error: error.message })
   }
