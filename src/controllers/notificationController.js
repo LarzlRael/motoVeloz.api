@@ -125,6 +125,7 @@ export async function getNotifications(req, res) {
 
 export async function editNotification(req, res) {
   verifyErrors(req)
+<<<<<<< HEAD
   const { title, body, imageUrl } = req.body
   console.log(title, body, imageUrl)
   try {
@@ -138,6 +139,33 @@ export async function editNotification(req, res) {
     notification.imageUrl = imageUrl
     const notificationSaved = await notification.save()
     res.status(200).json(notificationSaved)
+=======
+  const { id } = req.params
+  const file = req.file
+  try {
+    const notification = await Notification.findById(req.params.id)
+    if (!notification) {
+      res.status(404).json({ message: 'Notification not found' })
+    }
+    if (file) {
+      if (getStore.publicImageId) {
+        await cloudinary.uploader.destroy(getStore.publicImageId)
+      }
+      const result = await cloudinary.uploader.upload(file.path, {
+        folder: 'notifications',
+      })
+
+      await fs.promises.unlink(req.file.path)
+      req.body.imageUrl = result.secure_url
+      req.body.publicImageId = result.public_id
+    }
+
+    const updatedNotification = await Notification.findByIdAndUpdate(id, {
+      ...req.body,
+    })
+
+    return res.status(200).json(updatedNotification)
+>>>>>>> deploy
   } catch (error) {
     res.status(500).json({ error: error.message })
   }

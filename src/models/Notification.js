@@ -8,7 +8,7 @@ const notificationSchema = Schema(
     publicImageId: { type: String },
   },
   {
-    timestamps: true,
+    timestamps: true, 
   },
 )
 
