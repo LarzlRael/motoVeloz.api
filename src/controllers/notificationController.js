@@ -84,14 +84,17 @@ export async function saveDeviceId(req, res) {
 
 export async function createNotification(req, res) {
   verifyErrors(req)
-  const { title, body } = req.body
 
+  res.status(200).json({ message: 'Notification created' })
+  const { title, body } = req.body
   const file = req.file
+
   if (file) {
     const cloudinaryUpload = await cloudinary.uploader.upload(file.path, {
       folder: 'notifications',
     })
     req.body.imageUrl = cloudinaryUpload.secure_url
+    req.body.publicImageId = cloudinaryUpload.public_id
     await fs.promises.unlink(req.file.path)
   }
 
@@ -99,6 +102,7 @@ export async function createNotification(req, res) {
     title: capitalizeFirstLetter(title),
     body: capitalizeFirstLetter(body),
     imageUrl: req.body.imageUrl,
+    publicImageId: req.body.publicImageId ?? null,
   })
 
   try {
@@ -125,47 +129,28 @@ export async function getNotifications(req, res) {
 
 export async function editNotification(req, res) {
   verifyErrors(req)
-<<<<<<< HEAD
-  const { title, body, imageUrl } = req.body
-  console.log(title, body, imageUrl)
-  try {
-    const notification = await Notification.findById(req.params.id)
-    if (notification) {
-      res.status(404).json({ message: 'Notification not found' })
-    }
 
-    notification.title = title
-    notification.body = body
-    notification.imageUrl = imageUrl
-    const notificationSaved = await notification.save()
-    res.status(200).json(notificationSaved)
-=======
-  const { id } = req.params
   const file = req.file
+  const { id } = req.params
   try {
-    const notification = await Notification.findById(req.params.id)
+    const notification = await Notification.findById(id)
     if (!notification) {
       res.status(404).json({ message: 'Notification not found' })
     }
     if (file) {
-      if (getStore.publicImageId) {
-        await cloudinary.uploader.destroy(getStore.publicImageId)
-      }
-      const result = await cloudinary.uploader.upload(file.path, {
+      await cloudinary.uploader.destroy(notification.publicImageId)
+      const cloudinaryUpload = await cloudinary.uploader.upload(file.path, {
         folder: 'notifications',
       })
-
       await fs.promises.unlink(req.file.path)
-      req.body.imageUrl = result.secure_url
-      req.body.publicImageId = result.public_id
+      req.body.imageUrl = cloudinaryUpload.secure_url
+      req.body.publicImageId = cloudinaryUpload.public_id
     }
 
     const updatedNotification = await Notification.findByIdAndUpdate(id, {
       ...req.body,
     })
-
-    return res.status(200).json(updatedNotification)
->>>>>>> deploy
+    res.status(200).json(updatedNotification)
   } catch (error) {
     res.status(500).json({ error: error.message })
   }
