@@ -6,7 +6,7 @@ npm run build
 
 #!
 
-rm -f '../motoVeloz.api/src/public/dist'
+rm -r '../motoVeloz.api/src/public/dist'
 cp -r './dist' '../motoVeloz.api/src/public/'
 
 
