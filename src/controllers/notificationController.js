@@ -180,6 +180,10 @@ async function sendPushNotification(title, body, image) {
       title,
       body,
       image: image,
+      icon: 'https://i.ibb.co/7bQQYkX/icon.png',
+      data: {
+        icon: 'https://i.ibb.co/7bQQYkX/icon.png',
+      },
     },
   }
 
