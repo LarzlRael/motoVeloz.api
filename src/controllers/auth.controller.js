@@ -23,13 +23,7 @@ export const login = async (req, res) => {
     })
   }
 
-  const token = jwt.sign({ uid: getUser.id }, process.env.JWTSEED, {
-    expiresIn: 14400,
-  })
-  return res.status(200).json({
-    token,
-    id: getUser.id_user,
-  })
+  returnToken(res, getUser.id)
 }
 
 export const register = async (req, res) => {
@@ -66,10 +60,16 @@ export const verifyToken = (req, res, next) => {
   }
   const decoded = jwt.verify(token, process.env.JWTSEED)
   req.userId = decoded.id
-  const newToken = jwt.sign({ uid: decoded.id }, process.env.JWTSEED, {
-    expiresIn: 14400,
+
+  returnToken(res, req.userIdd)
+}
+
+function returnToken(res, userId) {
+  const token = jwt.sign({ uid: userId }, process.env.JWTSEED, {
+    expiresIn: '24h',
   })
   return res.status(200).json({
-    token: newToken,
+    token,
+    id: userId,
   })
 }
